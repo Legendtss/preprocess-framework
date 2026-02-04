@@ -1,21 +1,63 @@
 Modular Preprocessing & Feature Engineering Pipeline
-Project Overview
-This repository contains a modular, configuration-driven preprocessing framework built using Python, Scikit-learn, and pandas. The goal of this project was to move away from hard-coded transformation scripts and instead create a reusable pipeline that ensures reproducibility and prevents data leakage during the machine learning lifecycle.
+Overview
+This project implements a robust, configuration-driven preprocessing pipeline using Python, scikit-learn, and pandas. It is designed to transform raw datasets into machine-learning-ready formats while ensuring reproducibility and preventing data leakage.
 
-The architecture leverages Scikit-learn’s Pipeline and ColumnTransformer to handle complex datasets with diverse data types. By separating the transformation logic from the dataset schema, the pipeline can be reconfigured for different projects simply by updating a configuration dictionary.
+By using a factory pattern to generate the pipeline, the transformation logic is decoupled from the dataset schema, allowing for easy extension and updates.
 
 Key Features
-Automated Missing Value Imputation: Uses strategy-based imputation (mean/median) for numeric features and constant-value filling for categorical data.
+Modular Architecture: Built using ColumnTransformer to apply specific logic to numeric and categorical features independently.
 
-Robust Scaling: Supports multiple scaling techniques, including StandardScaler and RobustScaler, to normalize numeric distributions.
+Dynamic Configuration: All transformation steps, including scaling and imputation strategies, are managed via a single config object.
 
-Advanced Encoding: Implements OneHotEncoder with handle_unknown='ignore' and explicit missing-category tracking to ensure stability in production environments.
+Missing Value Handling: Implements automated imputation for both numerical (mean/median) and categorical data (constant filling).
 
-Extensible Design: The modular factory pattern allows for easy integration of custom transformers or new feature engineering steps.
+Feature Transformation: Includes standardized scaling for numerical values and One-Hot Encoding for categorical variables.
 
+Production Ready: Uses handle_unknown='ignore' in encoding steps to ensure the pipeline does not crash on unseen data categories.
+
+Project Structure
+pipeline_factory.py: The core module containing the function to build the Scikit-learn pipeline.
+
+run_pipeline.py: An implementation script demonstrating the pipeline on a sample customer dataset.
+
+requirements.txt: List of necessary libraries (pandas, scikit-learn, numpy).
+
+Configuration Example
+The pipeline is entirely driven by a dictionary schema, making it highly flexible:
+
+Python
+
+pipeline_cfg = {
+    'numeric': {
+        'cols': ['tenure_months', 'monthly_spend'],
+        'impute_strategy': 'mean',
+        'scaling': 'standard'
+    },
+    'categorical': {
+        'cols': ['region', 'plan_type']
+    }
+}
+Usage
+Clone the repository and ensure you have the requirements installed.
+
+Define your schema in the configuration dictionary.
+
+Execute the pipeline:
+
+Python
+
+from pipeline_factory import create_preprocessing_pipeline
+
+# Initialize
+pipe = create_preprocessing_pipeline(pipeline_cfg)
+
+# Fit and transform your raw data
+processed_data = pipe.fit_transform(raw_df)
 Technologies Used
 Python 3.8+
 
-Scikit-learn: For core pipeline architecture.
+Pandas: For data manipulation and DataFrame handling.
 
-Pandas & NumPy: For efficient data manipulation and array handling.
+Scikit-Learn: For the Pipeline and ColumnTransformer architecture.
+
+NumPy: For efficient numerical operations.
